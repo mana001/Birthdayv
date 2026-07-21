@@ -494,7 +494,7 @@
     </div>
 
     <script>
-        // CONFIGURATION: Paste your JSONbin details here for GitHub Pages cloud storage
+        // CONFIGURATION: Your JSONbin credentials
         const BIN_ID = "6a5ff75ef5f4af5e29ae88c0";       
         const API_KEY = "$2a$10$ZeLr8YhaCx0TddzmhFZA.u5OiABxCAYvj2D0x2LoMDqEAgaB7x4NW";   
 
@@ -609,7 +609,7 @@
                         headers: { 'X-Master-Key': API_KEY }
                     });
                     let json = await res.json();
-                    submissions = json.record || [];
+                    submissions = json.record.submissions || [];
                 } catch (e) {
                     console.error("Fetch error", e);
                 }
@@ -625,14 +625,13 @@
                             'Content-Type': 'application/json',
                             'X-Master-Key': API_KEY
                         },
-                        body: JSON.stringify(submissions)
+                        body: JSON.stringify({ submissions: submissions })
                     });
                 } catch (e) {
                     console.error("Save error", e);
                 }
             }
 
-            // Fallback local storage
             localStorage.setItem('sharedAestheticSubmissions', JSON.stringify(submissions));
         }
 
@@ -655,7 +654,7 @@
                         headers: { 'X-Master-Key': API_KEY }
                     });
                     let json = await res.json();
-                    submissions = json.record || [];
+                    submissions = json.record.submissions || [];
                 } catch (e) {
                     console.error("Fetch error", e);
                 }
