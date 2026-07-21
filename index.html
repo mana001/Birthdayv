@@ -558,6 +558,10 @@
                 currentStep++;
                 updateStep();
             } else {
+                // Show loading state immediately so it doesn't look frozen
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Saving to cloud... 🌸';
+
                 const formData = new FormData(form);
                 const dataObj = {};
                 const habits = [];
@@ -574,6 +578,7 @@
 
                 await saveSubmission(dataObj);
 
+                nextBtn.disabled = false;
                 alert('🎉 Successfully submitted and shared!');
                 form.reset();
                 currentStep = 1;
