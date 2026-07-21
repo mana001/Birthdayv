@@ -1,916 +1,692 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lovely Survey</title>
-  <style>
-    :root {
-      --bg1: #fff7fb;
-      --bg2: #f6fbff;
-      --card: rgba(255, 255, 255, 0.72);
-      --card-border: rgba(255, 255, 255, 0.6);
-      --text: #48324a;
-      --muted: #7a6679;
-      --accent: #ff7db8;
-      --accent2: #7aa9ff;
-      --accent3: #8fd3c8;
-      --shadow: 0 24px 80px rgba(140, 92, 120, 0.18);
-      --shadow-soft: 0 10px 30px rgba(140, 92, 120, 0.12);
-      --radius: 28px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Aesthetic Survey & Toggle Wall</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fff0f3 0%, #fde2e4 50%, #fad2e1 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --primary: #ff8fab;
+            --primary-hover: #ff7096;
+            --secondary: #fb6f92;
+            --text-main: #4a4e69;
+            --text-light: #9a8c98;
+            --border-color: rgba(255, 175, 204, 0.4);
+            --shadow: 0 20px 40px rgba(255, 143, 171, 0.15);
+            --radius: 24px;
+        }
 
-    * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      overflow-x: hidden;
-      background:
-        radial-gradient(circle at top left, rgba(255, 160, 206, 0.28), transparent 28%),
-        radial-gradient(circle at top right, rgba(122, 169, 255, 0.24), transparent 25%),
-        radial-gradient(circle at bottom left, rgba(143, 211, 200, 0.22), transparent 28%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
-    }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-    body::before, body::after {
-      content: "";
-      position: fixed;
-      inset: auto;
-      width: 380px;
-      height: 380px;
-      border-radius: 50%;
-      filter: blur(10px);
-      opacity: 0.4;
-      z-index: 0;
-      pointer-events: none;
-      animation: floaty 14s ease-in-out infinite;
-    }
-    body::before { top: -120px; right: -120px; background: radial-gradient(circle, rgba(255, 125, 184, .45), transparent 65%); }
-    body::after { bottom: -130px; left: -130px; background: radial-gradient(circle, rgba(122, 169, 255, .35), transparent 65%); animation-delay: -7s; }
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
 
-    @keyframes floaty {
-      0%, 100% { transform: translate3d(0,0,0) scale(1); }
-      50% { transform: translate3d(0, -18px, 0) scale(1.05); }
-    }
+        .bubble:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 10%; animation-duration: 6s; }
+        .bubble:nth-child(2) { width: 120px; height: 120px; bottom: 15%; right: 10%; animation-duration: 9s; }
+        .bubble:nth-child(3) { width: 60px; height: 60px; top: 20%; right: 20%; animation-duration: 5s; }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 28px;
-    }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
 
-    .shell {
-      width: min(980px, 100%);
-      display: grid;
-      grid-template-columns: 1.05fr 1.4fr;
-      gap: 22px;
-      align-items: stretch;
-    }
+        .survey-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--border-color);
+            width: 100%;
+            max-width: 700px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            z-index: 10;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
 
-    .panel, .survey {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: var(--radius);
-      overflow: hidden;
-      position: relative;
-    }
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
-    .panel {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 680px;
-      isolation: isolate;
-    }
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-    .survey {
-      min-height: 680px;
-      padding: 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
+        .tab-btn {
+            background: #f8edeb;
+            border: 2px solid #fbc3d1;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(255,125,184,.18), rgba(122,169,255,.18));
-      border: 1px solid rgba(255,255,255,0.7);
-      color: var(--muted);
-      font-weight: 700;
-      letter-spacing: .2px;
-      box-shadow: var(--shadow-soft);
-      animation: popIn .7s ease both;
-    }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff8fab, #fb6f92);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(251, 111, 146, 0.3);
+        }
 
-    .sparkle {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, #ffc7e1 30%, #ff7db8 70%, #ff5ea8 100%);
-      box-shadow: 0 0 0 6px rgba(255,125,184,.08);
-    }
+        .survey-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-    h1 {
-      margin: 16px 0 10px;
-      font-size: clamp(2.2rem, 5vw, 4rem);
-      line-height: .98;
-      letter-spacing: -0.05em;
-    }
+        .survey-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 26px;
+            color: var(--secondary);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
 
-    .title-gradient {
-      background: linear-gradient(90deg, #ff6fb3, #7aa9ff, #8fd3c8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+        .survey-header p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
 
-    .lead {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.02rem;
-      line-height: 1.7;
-      max-width: 44ch;
-    }
+        .progress-bar-container {
+            width: 100%;
+            background: #f8edeb;
+            height: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 175, 204, 0.2);
+        }
 
-    .glow-card {
-      margin-top: 24px;
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.28));
-      border: 1px solid rgba(255,255,255,.72);
-      box-shadow: var(--shadow-soft);
-      animation: lift 6s ease-in-out infinite;
-    }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8fab, #fb6f92);
+            width: 20%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+        }
 
-    @keyframes lift {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
 
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
+        .step.active {
+            display: block;
+        }
 
-    .mini {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(255,255,255,.78);
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-    .mini .label { font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
-    .mini .value { font-weight: 800; font-size: 1.08rem; }
+        .question-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
 
-    .orb-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
+        .input-group {
+            margin-bottom: 20px;
+        }
 
-    .orb {
-      width: 68px;
-      height: 68px;
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(255,125,184,.35), rgba(122,169,255,.35));
-      border: 1px solid rgba(255,255,255,.7);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-      animation: bob 5s ease-in-out infinite;
-    }
-    .orb:nth-child(2) { animation-delay: -1s; }
-    .orb:nth-child(3) { animation-delay: -2s; }
-    .orb::after {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.36);
-      filter: blur(0.2px);
-    }
-    @keyframes bob { 0%,100%{ transform: translateY(0) rotate(0deg);} 50%{ transform: translateY(-10px) rotate(5deg);} }
+        label.sub-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
 
-    .footnote {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: .92rem;
-      line-height: 1.65;
-    }
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #fbc3d1;
+            border-radius: 14px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 15px;
+            background: #fff;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
 
-    .survey-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(255, 143, 171, 0.3);
+        }
 
-    .brand {
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      font-size: 1.15rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
 
-    .brand-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ff7db8, #7aa9ff, #8fd3c8);
-      box-shadow: 0 10px 20px rgba(255,125,184,.18);
-    }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
 
-    .progress-wrap {
-      width: 100%;
-      padding: 14px 0 0;
-    }
+        .option-card {
+            border: 2px solid #fbc3d1;
+            border-radius: 14px;
+            padding: 14px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            transition: all 0.25s ease;
+            font-weight: 500;
+        }
 
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: .92rem;
-      margin-bottom: 10px;
-    }
+        .option-card:hover {
+            border-color: var(--primary);
+            background: #fff0f3;
+            transform: translateY(-2px);
+        }
 
-    .progress {
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.68);
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.9);
-      box-shadow: inset 0 2px 8px rgba(89, 61, 86, 0.06);
-    }
-    .progress > div {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #ff7db8, #7aa9ff, #8fd3c8);
-      transition: width .45s cubic-bezier(.2,.85,.2,1);
-      box-shadow: 0 0 16px rgba(122,169,255,.35);
-    }
+        .option-card input {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
 
-    .step-card {
-      flex: 1;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      gap: 14px;
-      padding: 8px 2px;
-      animation: slideUp .45s ease both;
-    }
-    .step-card.active { display: flex; }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px) scale(.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            padding: 12px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
 
-    .step-label {
-      color: var(--accent);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .16em;
-      font-size: .75rem;
-    }
+        .btn-prev {
+            background: #f8edeb;
+            color: var(--text-light);
+            border: 2px solid #e6ccbe;
+        }
 
-    .question {
-      margin: 0;
-      font-size: clamp(1.45rem, 2.4vw, 2rem);
-      line-height: 1.2;
-      letter-spacing: -0.04em;
-    }
+        .btn-prev:hover {
+            background: #e6ccbe;
+            color: var(--text-main);
+        }
 
-    .hint {
-      color: var(--muted);
-      line-height: 1.65;
-      margin: 0;
-    }
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, #ff8fab, #fb6f92);
+            color: white;
+            box-shadow: 0 8px 20px rgba(251, 111, 146, 0.3);
+        }
 
-    .input, textarea, select {
-      width: 100%;
-      border: 1px solid rgba(132, 113, 130, 0.18);
-      background: rgba(255,255,255,.72);
-      border-radius: 18px;
-      padding: 15px 16px;
-      color: var(--text);
-      font: inherit;
-      box-shadow: 0 10px 30px rgba(140, 92, 120, 0.05);
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-      outline: none;
-    }
-    textarea { min-height: 130px; resize: vertical; }
-    .input:focus, textarea:focus, select:focus {
-      border-color: rgba(255,125,184,.55);
-      box-shadow: 0 0 0 6px rgba(255,125,184,.12), 0 10px 30px rgba(140, 92, 120, 0.08);
-      transform: translateY(-1px);
-    }
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(251, 111, 146, 0.4);
+            background: linear-gradient(135deg, #ff7096, #e75a7c);
+        }
 
-    .options {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 6px;
-    }
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+        }
 
-    .option {
-      cursor: pointer;
-      padding: 14px 15px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.7);
-      border: 1px solid rgba(132, 113, 130, 0.16);
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-      position: relative;
-      overflow: hidden;
-      user-select: none;
-      min-height: 62px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .option::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #ff7db8, #7aa9ff);
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 6px rgba(255,125,184,.08);
-    }
-    .option:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(140, 92, 120, 0.12);
-      border-color: rgba(255,125,184,.35);
-    }
-    .option.selected {
-      border-color: rgba(255,125,184,.6);
-      background: linear-gradient(135deg, rgba(255,125,184,.14), rgba(122,169,255,.12));
-      box-shadow: 0 16px 30px rgba(255,125,184,.10);
-    }
+        .host-control-box {
+            background: #fff0f3;
+            border: 2px dashed #ff8fab;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: auto;
-      padding-top: 8px;
-    }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
 
-    .btn {
-      appearance: none;
-      border: 0;
-      border-radius: 18px;
-      padding: 14px 18px;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .18s ease;
-      position: relative;
-      overflow: hidden;
-      min-width: 132px;
-    }
-    .btn:hover { transform: translateY(-2px); }
-    .btn:active { transform: translateY(0); }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
-    .btn.secondary {
-      background: rgba(255,255,255,.72);
-      color: var(--text);
-      border: 1px solid rgba(132, 113, 130, 0.16);
-      box-shadow: 0 10px 24px rgba(140, 92, 120, 0.08);
-    }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e6ccbe;
+            transition: .4s;
+            border-radius: 34px;
+        }
 
-    .btn.primary {
-      color: #fff;
-      background: linear-gradient(90deg, #ff7db8, #7aa9ff 60%, #8fd3c8);
-      box-shadow: 0 18px 36px rgba(122,169,255,.24);
-    }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
 
-    .btn::after {
-      content: "";
-      position: absolute;
-      inset: auto auto 0 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.35), transparent 70%);
-      transform: translateX(-120%);
-      transition: transform .8s ease;
-    }
-    .btn:hover::after { transform: translateX(120%); }
+        input:checked + .slider {
+            background-color: var(--secondary);
+        }
 
-    .btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      transform: none;
-    }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
 
-    .saved-box {
-      margin-top: 6px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.8);
-      background: rgba(255,255,255,.5);
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
-      max-height: 240px;
-      overflow: auto;
-    }
+        .wall-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
 
-    .saved-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      font-weight: 900;
-    }
+        .submission-card {
+            background: #fff;
+            border: 2px solid #fbc3d1;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255, 143, 171, 0.08);
+            animation: fadeIn 0.4s ease;
+        }
 
-    .saved-list {
-      display: grid;
-      gap: 10px;
-    }
+        .submission-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            color: var(--secondary);
+            margin-bottom: 6px;
+        }
 
-    .saved-item {
-      border-radius: 18px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(132, 113, 130, 0.12);
-    }
+        .submission-card p {
+            font-size: 13px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
 
-    .saved-item .name { font-weight: 900; }
-    .saved-item .meta { color: var(--muted); font-size: .88rem; margin-top: 4px; }
-    .saved-item .ans { margin-top: 8px; font-size: .95rem; line-height: 1.5; }
+        .submission-card .note {
+            background: #fff0f3;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-style: italic;
+            font-size: 13px;
+        }
 
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .pill {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.64);
-      border: 1px solid rgba(132, 113, 130, 0.12);
-      color: var(--muted);
-      font-size: .86rem;
-      font-weight: 700;
-    }
-
-    .complete {
-      display: none;
-      text-align: center;
-      padding: 24px 12px;
-    }
-    .complete.show { display: block; }
-    .complete .big {
-      font-size: 3.2rem;
-      margin: 0 0 8px;
-    }
-
-    .small-note {
-      color: var(--muted);
-      font-size: .92rem;
-      margin-top: 8px;
-      line-height: 1.6;
-    }
-
-    .pop {
-      animation: popIn .45s ease both;
-    }
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(.96) translateY(8px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .floating-hearts {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: -1;
-    }
-    .heart {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: rgba(255,125,184,.36);
-      transform: rotate(45deg);
-      animation: drift linear infinite;
-      border-radius: 2px;
-      filter: blur(0.2px);
-    }
-    .heart::before, .heart::after {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: inherit;
-      border-radius: 50%;
-    }
-    .heart::before { left: -6px; }
-    .heart::after { top: -6px; }
-    @keyframes drift {
-      from { transform: translateY(110%) rotate(45deg); opacity: 0; }
-      10% { opacity: .85; }
-      to { transform: translateY(-120%) rotate(45deg); opacity: 0; }
-    }
-
-    @media (max-width: 900px) {
-      .shell { grid-template-columns: 1fr; }
-      .panel, .survey { min-height: auto; }
-    }
-
-    @media (max-width: 640px) {
-      .wrap { padding: 14px; }
-      .panel, .survey { padding: 18px; border-radius: 22px; }
-      .options { grid-template-columns: 1fr; }
-      .mini-grid { grid-template-columns: 1fr; }
-      .nav { flex-direction: column; }
-      .btn { width: 100%; }
-      .survey-top { align-items: flex-start; }
-    }
-  </style>
+        .loading-text, .empty-text, .locked-text {
+            text-align: center;
+            color: var(--text-light);
+            padding: 30px;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="shell">
-      <section class="panel">
-        <div class="floating-hearts" aria-hidden="true" id="hearts"></div>
 
-        <div>
-          <div class="badge"><span class="sparkle"></span> Elegant Cute Survey Studio</div>
-          <h1><span class="title-gradient">Lovely</span><br />Survey Site</h1>
-          <p class="lead">
-            A fancy multi-step survey with smooth animation, soft glassmorphism, and a sweet pastel theme.
-            Every submission is saved locally under the submitter’s name.
-          </p>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
 
-          <div class="glow-card">
-            <div class="mini-grid">
-              <div class="mini">
-                <div class="label">Style</div>
-                <div class="value">Cute + Elegant</div>
-              </div>
-              <div class="mini">
-                <div class="label">Flow</div>
-                <div class="value">Step-by-step</div>
-              </div>
-              <div class="mini">
-                <div class="label">Saved by</div>
-                <div class="value">Submitter name</div>
-              </div>
-              <div class="mini">
-                <div class="label">Storage</div>
-                <div class="value">Local browser</div>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Soft gradients</span>
-              <span class="pill">Animated progress</span>
-              <span class="pill">Smooth transitions</span>
-              <span class="pill">Polished cards</span>
-            </div>
-          </div>
+    <div class="survey-container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tabSurvey" onclick="switchView('survey')">✨ Take Survey</button>
+            <button class="tab-btn" id="tabWall" onclick="switchView('wall')">🌸 Community Wall</button>
         </div>
 
-        <div>
-          <div class="saved-box">
-            <div class="saved-title">
-              <span>Saved submissions</span>
-              <span id="saveCount">0</span>
+        <!-- SURVEY VIEW -->
+        <div id="surveyView" class="view-section active">
+            <div class="survey-header" id="header-section">
+                <h1>✨ Dreamy Vibe Check ✨</h1>
+                <p>Fill out the survey so everyone can share their responses!</p>
             </div>
-            <div class="saved-list" id="savedList"></div>
-            <div class="small-note">Entries are stored in <strong>localStorage</strong> on this device. Refreshing keeps them.</div>
-          </div>
-        </div>
-      </section>
 
-      <section class="survey">
-        <div class="survey-top">
-          <div class="brand"><span class="brand-mark"></span> Sweet Survey</div>
-          <div class="badge" id="stepBadge">Step 1 of 8</div>
-        </div>
-
-        <div class="progress-wrap">
-          <div class="progress-meta">
-            <span>Progress</span>
-            <span id="progressLabel">0%</span>
-          </div>
-          <div class="progress"><div id="progressBar"></div></div>
-        </div>
-
-        <div id="formArea">
-          <div class="step-card active" data-step="0">
-            <div class="step-label">Welcome</div>
-            <h2 class="question">Let’s make this beautiful.</h2>
-            <p class="hint">This survey is longer on purpose, so it feels more like a luxe experience. Tap next to begin.</p>
-            <div class="input-row">
-              <input class="input" id="q0" placeholder="Your name" autocomplete="name" />
+            <div class="progress-bar-container" id="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
             </div>
-          </div>
 
-          <div class="step-card" data-step="1">
-            <div class="step-label">About you</div>
-            <h2 class="question">What describes your vibe best?</h2>
-            <div class="options single" data-name="q1">
-              <div class="option" data-value="Soft and calm">Soft and calm</div>
-              <div class="option" data-value="Bold and playful">Bold and playful</div>
-              <div class="option" data-value="Minimal and chic">Minimal and chic</div>
-              <div class="option" data-value="Creative and dreamy">Creative and dreamy</div>
-            </div>
-          </div>
+            <form id="cuteSurveyForm">
+                <div class="step active" data-step="1">
+                    <div class="question-title">1. What shall we call you?</div>
+                    <div class="input-group">
+                        <label class="sub-label">Your Cute Nickname or Name</label>
+                        <input type="text" name="userName" placeholder="e.g., Luna Star" required>
+                    </div>
+                </div>
 
-          <div class="step-card" data-step="2">
-            <div class="step-label">Preferences</div>
-            <h2 class="question">Which colors feel most lovely to you?</h2>
-            <div class="options single" data-name="q2">
-              <div class="option" data-value="Pastels">Pastels</div>
-              <div class="option" data-value="Neutrals">Neutrals</div>
-              <div class="option" data-value="Bright colors">Bright colors</div>
-              <div class="option" data-value="Romantic tones">Romantic tones</div>
-            </div>
-          </div>
+                <div class="step" data-step="2">
+                    <div class="question-title">2. Choose your ultimate aesthetic palette</div>
+                    <div class="input-group">
+                        <label class="sub-label">What color palette brings you inner peace?</label>
+                        <div class="options-grid">
+                            <label class="option-card"><input type="radio" name="palette" value="Soft Pastels" required> Pastel Pink & Cream</label>
+                            <label class="option-card"><input type="radio" name="palette" value="Cozy Cottagecore"> Sage Green & Gold</label>
+                            <label class="option-card"><input type="radio" name="palette" value="Midnight Lavender"> Lavender & Midnight</label>
+                            <label class="option-card"><input type="radio" name="palette" value="Sunny Warmth"> Warm Honey & Peach</label>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="step-card" data-step="3">
-            <div class="step-label">Lifestyle</div>
-            <h2 class="question">What is your favorite kind of day?</h2>
-            <div class="options single" data-name="q3">
-              <div class="option" data-value="Quiet and cozy">Quiet and cozy</div>
-              <div class="option" data-value="Busy and productive">Busy and productive</div>
-              <div class="option" data-value="Social and fun">Social and fun</div>
-              <div class="option" data-value="Peaceful and creative">Peaceful and creative</div>
-            </div>
-          </div>
+                <div class="step" data-step="3">
+                    <div class="question-title">3. How do you spend your coziest days?</div>
+                    <div class="input-group">
+                        <label class="sub-label">Select your favorite comfort activities</label>
+                        <div class="options-grid">
+                            <label class="option-card"><input type="checkbox" name="habits" value="Reading novels"> 📖 Reading Novels</label>
+                            <label class="option-card"><input type="checkbox" name="habits" value="Coding cute apps"> 💻 Coding Apps</label>
+                            <label class="option-card"><input type="checkbox" name="habits" value="Gaming & Simulators"> 🎮 Cozy Gaming</label>
+                            <label class="option-card"><input type="checkbox" name="habits" value="Baking treats"> 🧁 Baking Treats</label>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="step-card" data-step="4">
-            <div class="step-label">Favorites</div>
-            <h2 class="question">What is one thing you adore?</h2>
-            <input class="input" id="q4" placeholder="Example: tea, sunsets, music, books" />
-            <p class="hint">You can make this personal, simple, or whimsical.</p>
-          </div>
+                <div class="step" data-step="4">
+                    <div class="question-title">4. Pick your dream sanctuary</div>
+                    <div class="input-group">
+                        <label class="sub-label">Where would your ideal secret hideaway be?</label>
+                        <select name="sanctuary" required>
+                            <option value="" disabled selected>Select a magical place...</option>
+                            <option value="A quiet cottage in the woods">A quiet cottage tucked in the woods</option>
+                            <option value="A rainy city apartment with fairy lights">A cozy rainy city apartment with fairy lights</option>
+                            <option value="A sun-drenched coastal beach house">A sun-drenched coastal beach house</option>
+                            <option value="A high mountain cabin above the stars">A high mountain cabin above the stars</option>
+                        </select>
+                    </div>
+                </div>
 
-          <div class="step-card" data-step="5">
-            <div class="step-label">Experience</div>
-            <h2 class="question">How should the site feel?</h2>
-            <textarea id="q5" placeholder="Describe the mood you want..."></textarea>
-          </div>
+                <div class="step" data-step="5">
+                    <div class="question-title">5. Leave a sweet note for everyone</div>
+                    <div class="input-group">
+                        <label class="sub-label">Write down a little affirmation or wish:</label>
+                        <textarea name="sweetNote" placeholder="Type something sweet..." required></textarea>
+                    </div>
+                </div>
 
-          <div class="step-card" data-step="6">
-            <div class="step-label">Details</div>
-            <h2 class="question">Choose your preferred pace.</h2>
-            <div class="options single" data-name="q6">
-              <div class="option" data-value="Fast and energetic">Fast and energetic</div>
-              <div class="option" data-value="Smooth and gentle">Smooth and gentle</div>
-              <div class="option" data-value="Luxurious and slow">Luxurious and slow</div>
-              <div class="option" data-value="Bright and lively">Bright and lively</div>
-            </div>
-          </div>
-
-          <div class="step-card" data-step="7">
-            <div class="step-label">Final step</div>
-            <h2 class="question">Any extra note before submitting?</h2>
-            <textarea id="q7" placeholder="Write anything you'd like saved with your submission..."></textarea>
-            <p class="hint">Your answers will be saved under the name you entered at the start.</p>
-          </div>
-
-          <div class="complete" id="completeBox">
-            <div class="big">✨</div>
-            <h2 class="question">Submission saved beautifully.</h2>
-            <p class="hint" id="completeText"></p>
-          </div>
+                <div class="button-group" id="navButtonGroup">
+                    <button type="button" class="btn btn-prev" id="prevBtn" style="display: none;">Back</button>
+                    <button type="button" class="btn btn-next" id="nextBtn">Next ✨</button>
+                </div>
+            </form>
         </div>
 
-        <div class="nav">
-          <button class="btn secondary" id="backBtn" disabled>Back</button>
-          <button class="btn primary" id="nextBtn">Next</button>
+        <!-- COMMUNITY WALL / HOST VIEW -->
+        <div id="wallView" class="view-section">
+            <div class="survey-header">
+                <h1>💖 Shared Responses Wall 💖</h1>
+                <p>Check out what everyone has submitted!</p>
+            </div>
+
+            <div class="host-control-box" id="hostControlBox">
+                <div>
+                    <strong style="font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--secondary);">👑 Host Toggle Control</strong>
+                    <p style="font-size: 12px; color: var(--text-light);">Turn ON to let everyone see the wall. Turn OFF to hide it from guests.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="publicWallToggle" checked onchange="toggleWallVisibility()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="wall-container" id="submissionsWall">
+                <div class="loading-text">Loading submissions... 🌸</div>
+            </div>
+
+            <button type="button" class="btn btn-next" style="width: 100%; margin-top: 15px;" onclick="fetchSubmissions()">🔄 Refresh Wall</button>
         </div>
-      </section>
     </div>
-  </div>
 
-  <script>
-    const steps = Array.from(document.querySelectorAll('.step-card'));
-    const nextBtn = document.getElementById('nextBtn');
-    const backBtn = document.getElementById('backBtn');
-    const progressBar = document.getElementById('progressBar');
-    const progressLabel = document.getElementById('progressLabel');
-    const stepBadge = document.getElementById('stepBadge');
-    const savedList = document.getElementById('savedList');
-    const saveCount = document.getElementById('saveCount');
-    const formArea = document.getElementById('formArea');
-    const completeBox = document.getElementById('completeBox');
-    const completeText = document.getElementById('completeText');
-    const hearts = document.getElementById('hearts');
+    <script>
+        // CONFIGURATION: Paste your JSONbin details here for GitHub Pages cloud storage
+        const BIN_ID = "6a5ff75ef5f4af5e29ae88c0";       
+        const API_KEY = "$2a$10$ZeLr8YhaCx0TddzmhFZA.u5OiABxCAYvj2D0x2LoMDqEAgaB7x4NW";   
 
-    const totalSteps = steps.length;
-    let current = 0;
-    const answers = {
-      q0: '', q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: ''
-    };
+        let currentStep = 1;
+        const totalSteps = 5;
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+        const steps = document.querySelectorAll('.step');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const form = document.getElementById('cuteSurveyForm');
 
-    function storageKey() {
-      return 'lovelySurveySubmissions';
-    }
-
-    function loadSubmissions() {
-      try {
-        return JSON.parse(localStorage.getItem(storageKey()) || '[]');
-      } catch {
-        return [];
-      }
-    }
-
-    function saveSubmissions(items) {
-      localStorage.setItem(storageKey(), JSON.stringify(items));
-    }
-
-    function renderSaved() {
-      const items = loadSubmissions();
-      saveCount.textContent = items.length;
-      savedList.innerHTML = items.length
-        ? items.slice().reverse().map(item => `
-          <div class="saved-item pop">
-            <div class="name">${escapeHtml(item.name)}</div>
-            <div class="meta">Saved on ${escapeHtml(item.savedAt)}</div>
-            <div class="ans"><strong>Vibe:</strong> ${escapeHtml(item.answers.q1 || '—')}<br>
-            <strong>Color:</strong> ${escapeHtml(item.answers.q2 || '—')}<br>
-            <strong>Note:</strong> ${escapeHtml(item.answers.q7 || '—')}</div>
-          </div>
-        `).join('')
-        : '<div class="saved-item"><div class="name">No submissions yet</div><div class="meta">Your first entry will appear here.</div></div>';
-    }
-
-    function updateProgress() {
-      const pct = Math.round((current / (totalSteps - 1)) * 100);
-      progressBar.style.width = `${pct}%`;
-      progressLabel.textContent = `${pct}%`;
-      stepBadge.textContent = `Step ${Math.min(current + 1, totalSteps)} of ${totalSteps}`;
-      backBtn.disabled = current === 0;
-      nextBtn.textContent = current === totalSteps - 1 ? 'Submit' : 'Next';
-    }
-
-    function showStep(index) {
-      current = Math.max(0, Math.min(index, totalSteps - 1));
-      steps.forEach((step, i) => step.classList.toggle('active', i === current));
-      formArea.classList.remove('complete-mode');
-      completeBox.classList.remove('show');
-      updateProgress();
-      if (current !== 0) backBtn.disabled = false;
-    }
-
-    function setSelectedOption(stepEl, value) {
-      stepEl.querySelectorAll('.option').forEach(opt => {
-        opt.classList.toggle('selected', opt.dataset.value === value);
-      });
-    }
-
-    document.querySelectorAll('.options').forEach(group => {
-      group.querySelectorAll('.option').forEach(opt => {
-        opt.addEventListener('click', () => {
-          const name = group.dataset.name;
-          answers[name] = opt.dataset.value;
-          setSelectedOption(group, opt.dataset.value);
+        window.addEventListener('DOMContentLoaded', () => {
+            const isPublic = localStorage.getItem('isWallPublic') !== 'false';
+            document.getElementById('publicWallToggle').checked = isPublic;
         });
-      });
-    });
 
-    function collectInputs() {
-      answers.q0 = document.getElementById('q0').value.trim();
-      answers.q4 = document.getElementById('q4').value.trim();
-      answers.q5 = document.getElementById('q5').value.trim();
-      answers.q7 = document.getElementById('q7').value.trim();
-    }
-
-    function validateCurrent() {
-      collectInputs();
-      const req = [
-        { idx: 0, ok: answers.q0 },
-        { idx: 1, ok: answers.q1 },
-        { idx: 2, ok: answers.q2 },
-        { idx: 3, ok: answers.q3 },
-        { idx: 4, ok: answers.q4 },
-        { idx: 5, ok: answers.q5 },
-        { idx: 6, ok: answers.q6 },
-        { idx: 7, ok: answers.q7 },
-      ];
-      return Boolean(req[current].ok);
-    }
-
-    function focusMissing() {
-      const idMap = ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'];
-      const el = document.getElementById(idMap[current]);
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) el.focus();
-    }
-
-    function submitSurvey() {
-      collectInputs();
-      const name = answers.q0 || 'Anonymous';
-      const item = {
-        name,
-        savedAt: new Date().toLocaleString(),
-        answers: { ...answers }
-      };
-      const items = loadSubmissions();
-      items.push(item);
-      saveSubmissions(items);
-      renderSaved();
-
-      steps.forEach(step => step.classList.remove('active'));
-      completeBox.classList.add('show');
-      formArea.appendChild(completeBox);
-      completeText.textContent = `Thanks, ${name}. Your answers were saved under your name.`;
-      progressBar.style.width = '100%';
-      progressLabel.textContent = '100%';
-      stepBadge.textContent = 'Completed';
-      nextBtn.textContent = 'Saved';
-      nextBtn.disabled = true;
-      backBtn.disabled = false;
-    }
-
-    nextBtn.addEventListener('click', () => {
-      collectInputs();
-      if (!validateCurrent()) {
-        const currentStep = steps[current];
-        currentStep.classList.remove('pop');
-        void currentStep.offsetWidth;
-        currentStep.classList.add('pop');
-        focusMissing();
-        return;
-      }
-
-      if (current === totalSteps - 1) {
-        submitSurvey();
-        return;
-      }
-
-      showStep(current + 1);
-    });
-
-    backBtn.addEventListener('click', () => {
-      if (current > 0) {
-        showStep(current - 1);
-        nextBtn.disabled = false;
-      }
-    });
-
-    // Floating hearts background
-    for (let i = 0; i < 18; i++) {
-      const heart = document.createElement('span');
-      heart.className = 'heart';
-      const size = 8 + Math.random() * 12;
-      heart.style.width = `${size}px`;
-      heart.style.height = `${size}px`;
-      heart.style.left = `${Math.random() * 100}%`;
-      heart.style.bottom = `${-20 - Math.random() * 180}px`;
-      heart.style.animationDuration = `${10 + Math.random() * 14}s`;
-      heart.style.animationDelay = `${-Math.random() * 20}s`;
-      heart.style.opacity = `${0.12 + Math.random() * 0.35}`;
-      hearts.appendChild(heart);
-    }
-
-    // initial render
-    renderSaved();
-    showStep(0);
-
-    // Save on Enter for text fields when appropriate
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-        if (e.target.tagName === 'INPUT') {
-          e.preventDefault();
-          nextBtn.click();
+        function toggleWallVisibility() {
+            const isPublic = document.getElementById('publicWallToggle').checked;
+            localStorage.setItem('isWallPublic', isPublic);
+            fetchSubmissions();
         }
-      }
-    });
-  </script>
+
+        function updateStep() {
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === currentStep - 1);
+            });
+            let progressPercent = (currentStep / totalSteps) * 100;
+            progressBar.style.width = progressPercent + '%';
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+            nextBtn.textContent = currentStep === totalSteps ? 'Submit & Share 🌸' : 'Next ✨';
+        }
+
+        function validateCurrentStep() {
+            const currentStepElement = document.querySelector(`.step[data-step="${currentStep}"]`);
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            for (let input of inputs) {
+                if (!input.value.trim()) {
+                    input.reportValidity();
+                    return false;
+                }
+            }
+
+            const radioGroup = currentStepElement.querySelector('input[type="radio"]');
+            if (radioGroup) {
+                const name = radioGroup.name;
+                const checked = currentStepElement.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    alert('Please select an option before moving forward! 🌷');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        nextBtn.addEventListener('click', async () => {
+            if (!validateCurrentStep()) return;
+
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            } else {
+                const formData = new FormData(form);
+                const dataObj = {};
+                const habits = [];
+                
+                for (let [key, value] of formData.entries()) {
+                    if (key === 'habits') {
+                        habits.push(value);
+                    } else {
+                        dataObj[key] = value;
+                    }
+                }
+                dataObj['habits'] = habits.length > 0 ? habits.join(', ') : 'None selected';
+                dataObj['timestamp'] = new Date().toLocaleString();
+
+                await saveSubmission(dataObj);
+
+                alert('🎉 Successfully submitted and shared!');
+                form.reset();
+                currentStep = 1;
+                updateStep();
+                switchView('wall');
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        });
+
+        function switchView(view) {
+            document.getElementById('surveyView').classList.toggle('active', view === 'survey');
+            document.getElementById('wallView').classList.toggle('active', view === 'wall');
+            document.getElementById('tabSurvey').classList.toggle('active', view === 'survey');
+            document.getElementById('tabWall').classList.toggle('active', view === 'wall');
+
+            if (view === 'wall') {
+                fetchSubmissions();
+            }
+        }
+
+        async function saveSubmission(newSub) {
+            let submissions = [];
+            
+            if (BIN_ID && API_KEY) {
+                try {
+                    let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                        headers: { 'X-Master-Key': API_KEY }
+                    });
+                    let json = await res.json();
+                    submissions = json.record || [];
+                } catch (e) {
+                    console.error("Fetch error", e);
+                }
+            }
+
+            submissions.unshift(newSub);
+
+            if (BIN_ID && API_KEY) {
+                try {
+                    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': API_KEY
+                        },
+                        body: JSON.stringify(submissions)
+                    });
+                } catch (e) {
+                    console.error("Save error", e);
+                }
+            }
+
+            // Fallback local storage
+            localStorage.setItem('sharedAestheticSubmissions', JSON.stringify(submissions));
+        }
+
+        async function fetchSubmissions() {
+            const wall = document.getElementById('submissionsWall');
+            const isPublic = document.getElementById('publicWallToggle').checked;
+
+            if (!isPublic) {
+                wall.innerHTML = '<div class="locked-text">🔒 The Community Wall is currently turned off by the host. Only the host can view submissions right now! ✨</div>';
+                return;
+            }
+
+            wall.innerHTML = '<div class="loading-text">Loading shared submissions... 🌸</div>';
+
+            let submissions = [];
+
+            if (BIN_ID && API_KEY) {
+                try {
+                    let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                        headers: { 'X-Master-Key': API_KEY }
+                    });
+                    let json = await res.json();
+                    submissions = json.record || [];
+                } catch (e) {
+                    console.error("Fetch error", e);
+                }
+            }
+
+            if (!submissions || submissions.length === 0) {
+                submissions = JSON.parse(localStorage.getItem('sharedAestheticSubmissions') || '[]');
+            }
+
+            if (submissions.length === 0) {
+                wall.innerHTML = '<div class="empty-text">No submissions yet! Be the first to take the survey ✨</div>';
+                return;
+            }
+
+            wall.innerHTML = submissions.map(sub => `
+                <div class="submission-card">
+                    <h3>✨ ${escapeHtml(sub.userName || 'Anonymous')}</h3>
+                    <p><strong>Palette:</strong> ${escapeHtml(sub.palette || 'N/A')}</p>
+                    <p><strong>Activities:</strong> ${escapeHtml(sub.habits || 'N/A')}</p>
+                    <p><strong>Sanctuary:</strong> ${escapeHtml(sub.sanctuary || 'N/A')}</p>
+                    <div class="note">"${escapeHtml(sub.sweetNote || '')}"</div>
+                    <p style="font-size: 11px; color: var(--text-light); margin-top: 8px; text-align: right;">${escapeHtml(sub.timestamp || '')}</p>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
+        }
+
+        updateStep();
+    </script>
 </body>
 </html>
